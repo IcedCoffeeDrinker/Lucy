@@ -7,10 +7,6 @@ import json
 app = FastAPI()
 OLLAMA_URL = "http://192.168.1.234:11434/api/chat"
 MODEL = "dolphin-mistral"
-SYSTEM = "You are Lucy, a helpful assistant."
-
-sessions = {}
-system = {"role": "system", "content": "You are Lucy, a helpful assistant."}
 
 async def stream_ollama(messages: List[Dict]) -> AsyncGenerator[str, None]:
     async with httpx.AsyncClient(timeout=None) as client:
@@ -22,13 +18,8 @@ async def stream_ollama(messages: List[Dict]) -> AsyncGenerator[str, None]:
 
 @app.post("/ollama_api")
 async def chat_stream(payload: dict):
-    session_id = payload.get("session_id")
-    if session_id not in sessions:
-        sessions[session_id] = []
-        sessions[session_id].append(system)
-    sessions[session_id].append({"role": "user", "content": payload["message"]})
     async def event_generator():
-        async for chunk in stream_ollama(sessions[session_id]):
+        async for chunk in stream_ollama(payload["messages"]):
             yield chunk + "\n"
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
