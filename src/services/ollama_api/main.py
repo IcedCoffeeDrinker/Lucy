@@ -1,8 +1,13 @@
-import httpx
+import httpx, json
 from typing import AsyncGenerator, List, Dict
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
-import json
+
+'''
+Wrapper for locally hosted Ollama LLM
+Last edit: Implement server-side system message and session management
+use test_v3.py for testing
+'''
 
 app = FastAPI()
 OLLAMA_URL = "http://192.168.1.234:11434/api/chat"
@@ -32,6 +37,12 @@ async def chat_stream(payload: dict):
             yield chunk + "\n"
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
+def is_port_in_use(port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(("127.0.0.1", port)) == 0
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=5001, reload=True)
+    import socket
+    if not is_port_in_use(5001):
+        import uvicorn
+        uvicorn.run("main:app", host="0.0.0.0", port=5001, reload=True)
