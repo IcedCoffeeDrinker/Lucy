@@ -159,3 +159,6 @@ docker-compose.override.yml
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Ingore database files
+*.db
