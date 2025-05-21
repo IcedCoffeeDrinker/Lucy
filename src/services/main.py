@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.services.database.main import app as database_app
+from src.services.database_api.main import app as database_app
 from src.services.ollama_api.main import app as ollama_app
 from src.services.twilio_api.main import app as twilio_app
 app = FastAPI()
