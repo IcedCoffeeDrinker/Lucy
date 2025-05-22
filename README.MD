@@ -1,15 +1,19 @@
 # Lucy - AI Accountability Friend
 Lucy uses advanced emotional AI to provide motivational support through regular phone calls, helping you stay accountable and focused on your goals.
 
-Checkout Lucy's [demo product page](https://lucy-daily-drive.lovable.app/)
+Check out Lucy's [demo product page](https://lucy-daily-drive.lovable.app/)
 
 ## Description
-**Daily Check-ins** Lucy will call you either over discord or phone
-**Set Your Own Schedule** You tell Lucy when to call you
-**Goal Alignment** Be mocked, motivated, and held accountable for your daily progress
-**Emotional Intelligence** Lucy learns how to motivate you specifically - with kindness or tough love
+**Daily Check-ins** 
+Lucy will call you either over discord or phone
+**Set Your Own Schedule** 
+You tell Lucy when to call you
+**Goal Alignment** 
+Be mocked, motivated, and held accountable for your daily progress
+**Emotional Intelligence** 
+Lucy learns how to motivate you specifically - with kindness or tough love
 
-# Subscription Plans
+## Subscription Plans
 ### All plans include:
 - Personalized conversations
 - Memory of Past conversations
@@ -52,6 +56,6 @@ pip install -r requirements.txt
 Use the template `.env.example` file to create a `.env` at `Lucy/.env`
 Execute the central `main.py` file at `Lucy/src/services/main.py`
 
-# Project State
+## Project State
 Currently `database_api` and `ollama_api` are working.
 Ollama speaks to my local server and isn't set up to work with local model files yet. Docker has yet to be implemented and a migration from `pip` to `poetry` is planned. 
