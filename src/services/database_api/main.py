@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import APIRouter
 import sqlalchemy
 import sqlite3
 import databases
@@ -27,17 +27,17 @@ engine = sqlalchemy.create_engine(
 )
 metadata.create_all(engine)
 
-app = FastAPI()
+router = APIRouter()
 
-@app.on_event("startup")
+@router.on_event("startup")
 async def startup():
     await database.connect()
 
-@app.on_event("shutdown")
+@router.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
 
-@app.post("/database_api/create_user")
+@router.post("/database_api/create_user")
 async def create_user(payload: dict):
     name = payload.get("name")
     phone_number = payload.get("phone_number")
@@ -51,7 +51,7 @@ async def create_user(payload: dict):
         return existing_user
     return await get_user(user_id) # Check if user was created
 
-@app.get("/database_api/get_user/{user_id}")
+@router.get("/database_api/get_user/{user_id}")
 async def get_user(user_id: str):
     query = users.select().where(users.c.user_id == user_id)
     user = await database.fetch_one(query)
@@ -62,7 +62,10 @@ def is_port_in_use(port):
         return s.connect_ex(("127.0.0.1", port)) == 0
 
 if __name__ == "__main__":
+    from fastapi import FastAPI
+    standalone_app = FastAPI()
+    standalone_app.include_router(router)
     import socket
     if not is_port_in_use(5001):
         import uvicorn
-        uvicorn.run("main:app", host="0.0.0.0", port=5001, reload=True)
+        uvicorn.run(standalone_app, host="0.0.0.0", port=5001, reload=True) 
