@@ -1,0 +1,16 @@
+fastapi
+httpx
+uvicorn
+databases
+sqlalchemy
+sqlite3
+ulid
+twilio
+python-dotenv
+pyngrok
+numpy
+flask
+flask-sock
+
+
+
