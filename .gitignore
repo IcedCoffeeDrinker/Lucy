@@ -163,3 +163,8 @@ Temporary Items
 # Ingore database files
 *.db
 references/
+
+# Tests
+twilio_test_recording.wav
+code_1.py
+
