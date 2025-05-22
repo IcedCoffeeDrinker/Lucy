@@ -4,14 +4,18 @@ Lucy uses advanced emotional AI to provide motivational support through regular 
 Check out Lucy's [demo product page](https://lucy-daily-drive.lovable.app/)
 
 ## Description
-**Daily Check-ins** 
-Lucy will call you either over discord or phone
-**Set Your Own Schedule** 
-You tell Lucy when to call you
-**Goal Alignment** 
-Be mocked, motivated, and held accountable for your daily progress
-**Emotional Intelligence** 
-Lucy learns how to motivate you specifically - with kindness or tough love
+
++ **Daily Check-ins**
+--> Lucy connects with you daily via Discord or phone, ensuring you stay on track.
+
++ **Set Your Own Schedule**
+--> You decide when Lucy should call—flexibility tailored to your routine.
+
++ **Goal Alignment**
+--> Stay accountable with Lucy's unique blend of motivation, humor, and support.
+
++ **Emotional Intelligence**
+--> Lucy adapts to your needs, offering encouragement with kindness or tough love, just the way you need it.
 
 ## Subscription Plans
 ### All plans include:
