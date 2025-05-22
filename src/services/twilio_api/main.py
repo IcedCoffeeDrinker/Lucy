@@ -148,9 +148,17 @@ class StreamConnection:
     async def _handle_audio(self, payload_b64: str):
         raw_audio = base64.b64decode(payload_b64)
         # Assuming it's 8kHz, 1-channel mu-law from Twilio
-        pcm_audio = audioop.ulaw2lin(raw_audio, 2) # 2 bytes for 16-bit linear
-        print(f"[{self.user_id}] recv {len(raw_audio)} bytes (ulaw), decoded to {len(pcm_audio)} bytes (pcm)")
-        audio_queues[self.user_id].put(pcm_audio)
+        pcm_audio_segment = audioop.ulaw2lin(raw_audio, 2) # 2 bytes for 16-bit linear
+        gain_factor = 1.2
+            if pcm_audio_segment:
+                amplified_audio = audioop.mul(pcm_audio_segment, 2, gain_factor)
+                print(f"[{self.user_id}] recv {len(raw_audio)} bytes (ulaw), decoded to {len(pcm_audio_segment)} bytes (pcm), amplified to {len(amplified_audio)} bytes")
+                audio_queues[self.user_id].put(amplified_audio)
+            else:
+                audio_queues[self.user_id].put(pcm_audio_segment) 
+        except audioop.error as e:
+            print(f"[{self.user_id}] audioop.error during gain application: {e}. Using original PCM audio.")
+            audio_queues[self.user_id].put(pcm_audio_segment) 
 
     async def send_audio(self, payload_b64: str):
         """Send one 20 ms audio packet back into the call."""
@@ -194,6 +202,14 @@ async def twilio_stream(websocket: WebSocket, user_id: str):
             try:
                 removed_call = active_calls.pop(call_to_remove_index)
                 print(f"[{user_id}] Removed call (SID: {removed_call.get('call_sid')}) from 'active_calls' list.")
+                if removed_call and 'ngrok_public_url' in removed_call:
+                    url_to_disconnect = removed_call['ngrok_public_url']
+                    print(f"[{user_id}] Disconnecting ngrok tunnel: {url_to_disconnect}")
+                    try:
+                        await asyncio.to_thread(ngrok.disconnect, url_to_disconnect)
+                        print(f"[{user_id}] Successfully disconnected ngrok tunnel: {url_to_disconnect}")
+                    except Exception as e:
+                        print(f"[{user_id}] Error disconnecting ngrok tunnel {url_to_disconnect}: {e}")
             except IndexError:
                 print(f"[{user_id}] ERROR: IndexError while trying to pop call for user_id {user_id} from active_calls. List may have changed.")
         else:
