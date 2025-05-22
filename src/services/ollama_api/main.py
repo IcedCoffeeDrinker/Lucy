@@ -33,8 +33,11 @@ async def chat_stream(payload: dict):
         sessions[session_id].append(system)
     sessions[session_id].append({"role": "user", "content": payload["message"]})
     async def event_generator():
+        accumulated_chunks = ""
         async for chunk in stream_ollama(sessions[session_id]):
             yield chunk + "\n"
+            accumulated_chunks += chunk
+        sessions[session_id].append({"role": "assistant", "content": accumulated_chunks})
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 def is_port_in_use(port):
