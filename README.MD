@@ -44,22 +44,32 @@ Check out Lucy's [demo product page](https://lucy-daily-drive.lovable.app/)
 - [Twilio](https://github.com/twilio/twilio-python) / [Discord.js/voice](https://www.npmjs.com/package/@discordjs/voice)
 - [SQLite](https://sqlite.org/)
 - [Ollama](https://ollama.com/)
-- [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper)
+- [Faster-Whisper-Server](https://github.com/etalab-ia/faster-whisper-server)
 - [Docker](https://www.docker.com/)
 
 ## Testing / Local Deployment
-Currently Docker isn't used. 
-Instead create a python `.venv` at the root directory and install the dependencies with pip.
+Use Docker for local development. Install the docker engine first, then proceed.
+For local deployment:
 ```bash
+git clone https://github.com/IcedCoffeeDrinker/Lucy.git
 cd Lucy
-
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+docker-compose build
+docker-compose up
 ```
-Use the template `.env.example` file to create a `.env` at `Lucy/.env`
-Execute the central `main.py` file at `Lucy/src/services/main.py`
+Then in a seperate terminal:
+```bash
+# Execute any test by running them with python3. You may have to install additional dependencies.
+# Example:
+python3 src/services/faster_whisper_api/tests/test_live_transcription.py
+# most tests use dynamic paths, so you can execute them from anywhere
+```
+
 
 ## Project State
-Currently `database_api` and `ollama_api` are working.
-Ollama speaks to my local server and isn't set up to work with local model files yet. Docker has yet to be implemented and a migration from `pip` to `poetry` is planned. 
+Currently working:
+- `database_api`
+- `ollama_api`
+- `twilio_api`
+- `faster_whisper_api`
+
+Ollama speaks to my local server and isn't set up to work with local ollama files yet. A migration from `pip` to `poetry` is planned. 
