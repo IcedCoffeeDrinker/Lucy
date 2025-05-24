@@ -3,14 +3,10 @@ httpx
 uvicorn
 databases
 sqlalchemy
-sqlite3
+# sqlite3 # Removed as it's a built-in module
 ulid
 twilio
 python-dotenv
 pyngrok
 numpy
-flask
-flask-sock
-
-
-
+websockets 

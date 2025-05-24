@@ -2,11 +2,14 @@ from fastapi import FastAPI
 from ollama_api.main import router as ollama_router
 from twilio_api.main import router as twilio_router
 from database_api.main import router as database_router
+from faster_whisper_api.main import router as faster_whisper_router
+
 app = FastAPI()
 
 # already specified path in the imported apps, e.g. /ollama_api
 app.include_router(ollama_router)
 app.include_router(twilio_router)
+app.include_router(faster_whisper_router)
 app.include_router(database_router) # this has to be last, else crash :)
 
 if __name__ == "__main__":
