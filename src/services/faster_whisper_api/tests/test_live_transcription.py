@@ -17,7 +17,8 @@ YOUR_WAV_FILENAME = "test_input_16khz.wav" # Use the resampled 16kHz file
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 YOUR_WAV_FILE_PATH = os.path.join(SCRIPT_DIR, YOUR_WAV_FILENAME)
 
-WEBSOCKET_URL = "ws://localhost:8000/v1/audio/transcriptions"
+# Updated to point to the FastAPI wrapper endpoint
+WEBSOCKET_URL = "ws://localhost:5001/faster_whisper_api/live_transcribe"
 
 async def receive_transcriptions(websocket):
     """Receives and prints transcriptions from the server."""
