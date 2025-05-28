@@ -1,0 +1,108 @@
+# Stage 1: Clone the repository
+FROM alpine/git:latest AS cloner
+WORKDIR /app
+RUN git clone https://github.com/phildougherty/sesame_csm_openai.git .
+
+# Stage 2: Model Downloader (adapted from original Dockerfile)
+FROM python:3.10-slim AS model-downloader
+
+RUN pip install huggingface_hub
+
+WORKDIR /model-downloader
+RUN mkdir -p /model-downloader/models/csm-1b
+RUN mkdir -p /model-downloader/models/dia-1.6b
+
+ARG HF_TOKEN
+ENV HF_TOKEN=${HF_TOKEN}
+ARG TTS_ENGINE=csm # Default to csm, can be overridden at build time if needed
+
+# Login with token if provided
+RUN if [ -n "${HF_TOKEN}" ]; then \
+    huggingface-cli login --token ${HF_TOKEN}; \
+    fi
+
+# Download CSM-1B model
+RUN if [ -n "${HF_TOKEN}" ] || [ "${TTS_ENGINE}" = "csm" ]; then \
+    echo "Downloading CSM-1B model..."; \
+    huggingface-cli download sesame/csm-1b ckpt.pt --local-dir /model-downloader/models/csm-1b; \
+    else echo "Skipping CSM-1B model download"; fi
+
+# Download Dia-1.6B model
+RUN if [ -n "${HF_TOKEN}" ] || [ "${TTS_ENGINE}" = "dia" ]; then \
+    echo "Downloading Dia-1.6B model..."; \
+    huggingface-cli download nari-labs/Dia-1.6B config.json --local-dir /model-downloader/models/dia-1.6b; \
+    huggingface-cli download nari-labs/Dia-1.6B dia-v0_1.pth --local-dir /model-downloader/models/dia-1.6b; \
+    else echo "Skipping Dia-1.6B model download"; fi
+
+# Stage 3: Main application (adapted from original Dockerfile)
+FROM nvidia/cuda:12.4.0-base-ubuntu22.04
+
+ENV PYTHONFAULTHANDLER=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=random \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=100 \
+    NVIDIA_VISIBLE_DEVICES=all \
+    NVIDIA_DRIVER_CAPABILITIES=compute,utility \
+    TORCH_CUDA_ARCH_LIST="7.0;7.5;8.0;8.6" \
+    TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-dev \
+    ffmpeg \
+    git \
+    build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy requirements from the cloned repo
+COPY --from=cloner /app/requirements.txt .
+COPY --from=cloner /app/requirements-dia.txt .
+
+RUN mkdir -p /app/static /app/models /app/models/csm-1b /app/models/dia-1.6b \
+    /app/voice_memories /app/voice_references /app/voice_profiles \
+    /app/cloned_voices /app/audio_cache /app/tokenizers /app/logs && \
+    chmod -R 777 /app/voice_references /app/voice_profiles /app/voice_memories \
+    /app/cloned_voices /app/audio_cache /app/static /app/logs /app/tokenizers /app/models
+
+# Copy static files from the cloned repo
+COPY --from=cloner /app/static /app/static
+
+RUN pip3 install --no-cache-dir --upgrade pip && \
+    pip3 install torch torchaudio numpy
+
+RUN pip3 install git+https://github.com/pytorch/ao.git
+
+RUN git clone https://github.com/pytorch/torchtune.git /tmp/torchtune && \
+    cd /tmp/torchtune && \
+    git checkout main && \
+    pip install -e .
+
+RUN pip3 install -r requirements.txt
+
+ARG TTS_ENGINE=csm # Make sure this arg is available for this stage too
+RUN if [ "${TTS_ENGINE}" = "dia" ]; then \
+    echo "Installing Dia model dependencies..." && \
+    pip3 install -r requirements-dia.txt && \
+    echo "Dia model dependencies installed"; \
+fi
+
+RUN pip3 install yt-dlp openai-whisper
+
+# Copy application code from the cloned repo
+COPY --from=cloner /app/app /app/app
+
+# Copy downloaded models from the model-downloader stage
+COPY --from=model-downloader /model-downloader/models/csm-1b /app/models/csm-1b
+COPY --from=model-downloader /model-downloader/models/dia-1.6b /app/models/dia-1.6b
+
+RUN python3 -c "import torchtune.models; print('Available models in torchtune:', dir(torchtune.models))"
+
+EXPOSE 8000
+
+CMD ["python3", "-m", "app.main"] 

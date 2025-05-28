@@ -13,13 +13,15 @@ services:
       - ./src:/app/src
     depends_on:
       - whisper
+      - csm_tts
     environment:
       - WHISPER_SERVER_URL=http://whisper:8000/v1/
+      - CSM_TTS_SERVER_URL=http://csm-tts:8000/v1/
     networks:
       - app-network
 
   whisper:
-    image: fedirz/faster-whisper-server:latest-cpu
+    image: fedirz/faster-whisper-server:latest-cuda
     container_name: faster-whisper-server
     ports:
       - "8000:8000"
@@ -32,6 +34,35 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  csm_tts:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.sesame_csm_openai
+      args:
+        HF_TOKEN: ${HF_TOKEN}
+    container_name: csm-tts-server
+    ports:
+      - "8001:8000"
+    environment:
+      HF_TOKEN: ${HF_TOKEN}
+    restart: unless-stopped
+    networks:
+      - app-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
 networks:
   app-network:
