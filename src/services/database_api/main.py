@@ -9,7 +9,12 @@ import datetime
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 DATA_DIR = os.path.join(BASE_DIR, "data")
-DATABASE_URL = f"sqlite:///{os.path.join(DATA_DIR, 'users.db')}"
+
+# Ensure the data directory exists before trying to create/access the database file
+os.makedirs(DATA_DIR, exist_ok=True)
+
+DB_FILE_PATH = os.path.join(DATA_DIR, 'users.db')
+DATABASE_URL = f"sqlite:///{DB_FILE_PATH}" # Correctly forms sqlite:///path/to/db
 
 database = databases.Database(DATABASE_URL)
 metadata = sqlalchemy.MetaData()
