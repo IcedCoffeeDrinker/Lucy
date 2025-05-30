@@ -5,6 +5,7 @@ WORKDIR /app
 # Copy and install requirements
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --editable .
 
 # Copy the application code
 COPY ./src /app/src
