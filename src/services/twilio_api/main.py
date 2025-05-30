@@ -147,9 +147,11 @@ class StreamConnection:
 
     async def _handle_audio(self, payload_b64: str):
         raw_audio = base64.b64decode(payload_b64)
-        # Assuming it's 8kHz, 1-channel mu-law from Twilio
-        pcm_audio_segment = audioop.ulaw2lin(raw_audio, 2) # 2 bytes for 16-bit linear
-        gain_factor = 1.2
+        pcm_audio_segment = None  # Initialize to prevent NameError in except if ulaw2lin fails
+        try:
+            # Assuming it's 8kHz, 1-channel mu-law from Twilio
+            pcm_audio_segment = audioop.ulaw2lin(raw_audio, 2) # 2 bytes for 16-bit linear
+            gain_factor = 1.2
             if pcm_audio_segment:
                 amplified_audio = audioop.mul(pcm_audio_segment, 2, gain_factor)
                 print(f"[{self.user_id}] recv {len(raw_audio)} bytes (ulaw), decoded to {len(pcm_audio_segment)} bytes (pcm), amplified to {len(amplified_audio)} bytes")
@@ -157,8 +159,15 @@ class StreamConnection:
             else:
                 audio_queues[self.user_id].put(pcm_audio_segment) 
         except audioop.error as e:
-            print(f"[{self.user_id}] audioop.error during gain application: {e}. Using original PCM audio.")
-            audio_queues[self.user_id].put(pcm_audio_segment) 
+            print(f"[{self.user_id}] audioop.error during audio processing: {e}. Using original PCM if available.")
+            if pcm_audio_segment is not None: # Check if pcm_audio_segment was assigned
+                audio_queues[self.user_id].put(pcm_audio_segment)
+            else:
+                # pcm_audio_segment was not assigned, e.g. ulaw2lin failed.
+                # Decide what to do: put raw_audio, empty bytes, or nothing.
+                # For now, let's log and put empty bytes as a placeholder.
+                print(f"[{self.user_id}] pcm_audio_segment was not assigned before audioop.error. Putting empty audio chunk.")
+                audio_queues[self.user_id].put(b'') # Put empty bytes
 
     async def send_audio(self, payload_b64: str):
         """Send one 20 ms audio packet back into the call."""
