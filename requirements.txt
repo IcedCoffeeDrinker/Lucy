@@ -2,9 +2,10 @@ fastapi
 httpx
 uvicorn
 databases
+aiosqlite
 sqlalchemy
 # sqlite3 # Removed as it's a built-in module
-ulid
+python-ulid
 twilio
 python-dotenv
 pyngrok
