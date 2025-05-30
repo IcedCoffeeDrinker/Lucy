@@ -1,8 +1,8 @@
 from fastapi import FastAPI
-from ollama_api.main import router as ollama_router
-from twilio_api.main import router as twilio_router
-from database_api.main import router as database_router
-from faster_whisper_api.main import router as faster_whisper_router
+from .ollama_api.main import router as ollama_router
+from .twilio_api.main import router as twilio_router
+from .database_api.main import router as database_router
+from .faster_whisper_api.main import router as faster_whisper_router
 
 app = FastAPI()
 
