@@ -49,8 +49,17 @@ services:
     container_name: csm-tts-server
     ports:
       - "8001:8000"
+    volumes:
+      - ./deepspeed_config.json:/app/deepspeed_config.json
     environment:
       HF_TOKEN: ${HF_TOKEN}
+      PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
+    command: >
+      deepspeed
+      --num_gpus=1
+      --deepspeed /app/deepspeed_config.json
+      -- 
+      uvicorn app.generator:app --host 0.0.0.0 --port 8000
     restart: unless-stopped
     networks:
       - app-network

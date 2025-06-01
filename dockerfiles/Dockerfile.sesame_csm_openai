@@ -35,7 +35,7 @@ RUN if [ -n "${HF_TOKEN}" ] || [ "${TTS_ENGINE}" = "dia" ]; then \
     else echo "Skipping Dia-1.6B model download"; fi
 
 # Stage 3: Main application (adapted from original Dockerfile)
-FROM nvidia/cuda:12.4.0-base-ubuntu22.04
+FROM nvidia/cuda:12.4.0-devel-ubuntu22.04
 
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONUNBUFFERED=1 \
@@ -98,6 +98,7 @@ RUN if [ "${TTS_ENGINE}" = "dia" ]; then \
 fi
 
 RUN pip3 install yt-dlp openai-whisper
+RUN pip3 install deepspeed --no-cache-dir
 
 # Copy application code from the cloned repo
 COPY --from=cloner /app/app /app/app
