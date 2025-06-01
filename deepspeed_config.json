@@ -1,0 +1,15 @@
+{
+  "zero_optimization": {
+    "stage": 3,
+    "offload_param": {
+      "device": "cpu",
+      "pin_memory": true
+    },
+    "offload_optimizer": {
+      "device": "cpu",
+      "pin_memory": true
+    }
+  },
+  "train_batch_size": 1,
+  "train_micro_batch_size_per_gpu": 1
+}
