@@ -55,11 +55,7 @@ services:
       HF_TOKEN: ${HF_TOKEN}
       PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
     command: >
-      deepspeed
-      --num_gpus=1
-      --deepspeed /app/deepspeed_config.json
-      -- 
-      uvicorn app.generator:app --host 0.0.0.0 --port 8000
+      sh -c "which deepspeed && deepspeed --version || echo 'deepspeed --version failed' && deepspeed --help && sleep 300"
     restart: unless-stopped
     networks:
       - app-network
