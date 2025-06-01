@@ -1,4 +1,5 @@
 fastapi
+asyncio
 httpx
 uvicorn
 databases
