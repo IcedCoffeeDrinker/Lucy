@@ -31,7 +31,7 @@ async def generate_audio(text: str, user_id: str):
             print(f"An error occurred while requesting {exc.request.url!r}: {exc}")
 
 
-@router.post("/csm_api/conversation"{user_id})
+@router.post("/csm_api/conversation/{user_id}")
 async def handle_conversation(payload: dict):
     if user_id not in active_sessions:
         active_sessions[user_id] = []
