@@ -98,8 +98,6 @@ RUN if [ "${TTS_ENGINE}" = "dia" ]; then \
 fi
 
 RUN pip3 install yt-dlp openai-whisper
-RUN pip3 install deepspeed --no-cache-dir
-
 # Copy application code from the cloned repo
 COPY --from=cloner /app/app /app/app
 

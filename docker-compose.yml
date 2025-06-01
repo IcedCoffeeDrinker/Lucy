@@ -49,23 +49,20 @@ services:
     container_name: csm-tts-server
     ports:
       - "8001:8000"
-    volumes:
-      - ./deepspeed_config.json:/app/deepspeed_config.json
     environment:
       HF_TOKEN: ${HF_TOKEN}
       PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
-    command: >
-      sh -c "which deepspeed && deepspeed --version || echo 'deepspeed --version failed' && deepspeed --help && sleep 300"
+     # CUDA_VISIBLE_DEVICES: ""  # Force CPU by hiding GPUs
     restart: unless-stopped
     networks:
       - app-network
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    # deploy: # Comment out when using CPU
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
 
 networks:
   app-network:
