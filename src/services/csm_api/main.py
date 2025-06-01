@@ -13,7 +13,7 @@ async def generate_audio(text: str, user_id: str):
     payload = {
         "text": text,
         "speaker_id": 0,
-        "context": active_sessions[user_id],
+        "context": active_sessions[user_id]["context"],
         "temperature": 0.7,
         "response_format": "wav",
         "topk": 50
@@ -32,13 +32,13 @@ async def generate_audio(text: str, user_id: str):
 
 
 @router.post("/csm_api/conversation/{user_id}")
-async def handle_conversation(payload: dict):
+async def handle_conversation(user_id: str,payload: dict):
     if user_id not in active_sessions:
-        active_sessions[user_id] = []
+        active_sessions[user_id] = {"context": []}
     user_text, llm_text = payload.get("user_text"), payload.get("llm_text")
-    audio = generate_audio(llm_text, user_id)
+    audio = await generate_audio(llm_text, user_id)
     new_context = [{"text": user_text, "speaker_id": 0}, {"text": llm_text, "speaker_id": 1}]
-    active_sessions[user_id][context] += new_context
+    active_sessions[user_id]["context"] += new_context
     return {"audio": audio}
 
 @router.post("/csm_api/conversation/terminate/{user_id}")
