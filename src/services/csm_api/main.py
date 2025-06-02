@@ -2,7 +2,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from fastapi import APIRouter
 import httpx
-import ascyncio
+import asyncio
 
 router = APIRouter()
 active_sessions = {}
