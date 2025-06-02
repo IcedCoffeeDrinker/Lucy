@@ -6,7 +6,7 @@ import asyncio
 
 router = APIRouter()
 active_sessions = {}
-url = "http://localhost:8000/api/v1/audio/conversation"
+url = "http://csm-tts:8000/api/v1/audio/conversation"
 
 
 async def generate_audio(text: str, user_id: str):
