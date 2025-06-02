@@ -37,7 +37,7 @@ async def handle_conversation(user_id: str,payload: dict):
         active_sessions[user_id] = {"context": []}
     user_text, llm_text = payload.get("user_text"), payload.get("llm_text")
     audio = await generate_audio(llm_text, user_id)
-    new_context = [{"text": user_text, "speaker_id": 0}, {"text": llm_text, "speaker_id": 1}]
+    new_context = [{"text": user_text, "speaker": 0}, {"text": llm_text, "speaker_id": 1}]
     active_sessions[user_id]["context"] += new_context
     return {"audio": audio}
 

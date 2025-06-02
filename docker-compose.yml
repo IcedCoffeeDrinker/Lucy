@@ -14,7 +14,7 @@ services:
       - csm_tts
     environment:
       - WHISPER_SERVER_URL=http://whisper:8000/v1/
-      - CSM_TTS_SERVER_URL=http://csm-tts:8000/v1/
+      - CSM_TTS_SERVER_URL=http://csm_tts:8000/v1/
     networks:
       - app-network
 
