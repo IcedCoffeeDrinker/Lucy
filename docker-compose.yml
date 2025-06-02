@@ -52,7 +52,7 @@ services:
     environment:
       HF_TOKEN: ${HF_TOKEN}
       PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
-     # CUDA_VISIBLE_DEVICES: ""  # Force CPU by hiding GPUs
+      CUDA_VISIBLE_DEVICES: ""  # Force CPU by hiding GPUs, uncomment when using GPU
     restart: unless-stopped
     networks:
       - app-network
