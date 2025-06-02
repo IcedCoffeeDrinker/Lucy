@@ -20,6 +20,7 @@ async def generate_audio(text: str, user_id: str):
     }
     async with httpx.AsyncClient() as client:
         try:
+            print(payload) # debugging 
             response = await client.post(url, json=payload)
             response.raise_for_status()  # This will raise an exception for 4XX/5XX Sresponses
             audio_data = response.content  # This will be bytes
