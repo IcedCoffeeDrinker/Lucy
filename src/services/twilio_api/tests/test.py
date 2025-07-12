@@ -11,7 +11,7 @@ import threading # Kept for recorder, can be simplified further if needed
 
 # Basic Configuration
 FASTAPI_BASE_URL = "http://localhost:5001"
-TEST_USER_ID = "01JVT4A67BNZX7BJXKFVWKKHPM" # Keep your specific User ID
+TEST_USER_ID = "01JZ98A5YKRVWPSJH8P6MAP47X" # Keep your specific User ID
 OUTPUT_RECORDING_FILENAME = "twilio_test_recording.wav"
 SAMPLE_RATE = 8000  # Hz (Twilio standard for PSTN/voice)
 AUDIO_CHUNK_DURATION_MS = 20  # ms (standard for Twilio media stream)
