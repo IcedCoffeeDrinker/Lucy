@@ -58,6 +58,7 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+    gpus: all
     deploy: # Comment out when using CPU
       resources:
         reservations:
