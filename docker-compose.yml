@@ -52,7 +52,9 @@ services:
     environment:
       HF_TOKEN: ${HF_TOKEN}
       PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
-#      CUDA_VISIBLE_DEVICES: ""  # Force CPU by hiding GPUs, uncomment when using GPU
+      CSM_DEVICE_MAP: balanced # <--- those three settings are for multi-GPU support
+      TORCH_COMPILE_MODE: none # <---
+      ENABLE_QUANTIZATION: "false" # <---
     restart: unless-stopped
     networks:
       - app-network

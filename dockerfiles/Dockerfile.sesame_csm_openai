@@ -1,7 +1,7 @@
 # Stage 1: Clone the repository
 FROM alpine/git:latest AS cloner
 WORKDIR /app
-RUN git clone https://github.com/phildougherty/sesame_csm_openai.git .
+RUN git clone https://github.com/IcedCoffeeDrinker/sesame_csm_openai-fix_multi_GPU.git .
 
 # Stage 2: Model Downloader (adapted from original Dockerfile)
 FROM python:3.10-slim AS model-downloader
@@ -47,6 +47,9 @@ ENV PYTHONFAULTHANDLER=1 \
     NVIDIA_DRIVER_CAPABILITIES=compute,utility \
     TORCH_CUDA_ARCH_LIST="7.0;7.5;8.0;8.6" \
     TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
+ENV CSM_DEVICE_MAP=balanced \ # those three settings are for multi-GPU support
+    TORCH_COMPILE_MODE=none \
+    ENABLE_QUANTIZATION=false
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
