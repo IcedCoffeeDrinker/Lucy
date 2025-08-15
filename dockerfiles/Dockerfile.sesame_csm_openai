@@ -47,7 +47,8 @@ ENV PYTHONFAULTHANDLER=1 \
     NVIDIA_DRIVER_CAPABILITIES=compute,utility \
     TORCH_CUDA_ARCH_LIST="7.0;7.5;8.0;8.6" \
     TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
-ENV CSM_DEVICE_MAP=balanced \ # those three settings are for multi-GPU support
+# those three settings are for multi-GPU support
+ENV CSM_DEVICE_MAP=balanced \
     TORCH_COMPILE_MODE=none \
     ENABLE_QUANTIZATION=false
 
