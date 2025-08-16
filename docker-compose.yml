@@ -11,10 +11,10 @@ services:
       - ./src:/app/src
     depends_on:
       - whisper
-      - csm_tts
+      - csm-api
     environment:
       - WHISPER_SERVER_URL=http://whisper:8000/v1/
-      - CSM_TTS_SERVER_URL=http://csm_tts:8000/v1/
+      - CSM_TTS_SERVER_URL=http://csm-api:8000/v1/
     networks:
       - app-network
 
@@ -40,33 +40,36 @@ services:
               count: 1
               capabilities: [gpu]
 
-  csm_tts:
+  csm-api:
     build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.sesame_csm_openai
+      context: https://github.com/IcedCoffeeDrinker/sesame_csm_openai-fix_multi_GPU.git#main
+      dockerfile: Dockerfile
       args:
-        HF_TOKEN: ${HF_TOKEN}
-    container_name: csm-tts-server
+        - HF_TOKEN=${HF_TOKEN}
+        - TTS_ENGINE=${TTS_ENGINE:-csm}
     ports:
-      - "8001:8000"
+      - "8999:8000"
+    volumes:
+      - ./models:/app/models
+      - ./cloned_voices:/app/cloned_voices
+      - ./voice_references:/app/voice_references  
+      - ./voice_profiles:/app/voice_profiles    
     environment:
-      HF_TOKEN: ${HF_TOKEN}
-      PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
-      CSM_DEVICE_MAP: balanced # <--- those three settings are for multi-GPU support
-      TORCH_COMPILE_MODE: none # <---
-      ENABLE_QUANTIZATION: "false" # <---
-    restart: unless-stopped
+      - HF_TOKEN=${HF_TOKEN}  
+      - TTS_ENGINE=${TTS_ENGINE:-csm}  # Default to CSM if not specified
+      - CSM_DEVICE_MAP=${CSM_DEVICE_MAP:-balanced}
+      - TORCH_COMPILE_MODE=${TORCH_COMPILE_MODE:-none}
+      - ENABLE_QUANTIZATION=${ENABLE_QUANTIZATION:-false}
+      - NVIDIA_VISIBLE_DEVICES=all
     networks:
       - app-network
-    gpus: all
-    deploy: # Comment out when using CPU
+    deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-
 networks:
   app-network:
     driver: bridge
